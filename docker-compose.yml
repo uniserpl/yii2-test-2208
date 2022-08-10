@@ -25,4 +25,4 @@ services:
     volumes:
       - "dbdata_mysql_maria:/var/lib/mysql"
     ports:
-      - 127.0.0.1:3503:3306
+      - 3503:3306
