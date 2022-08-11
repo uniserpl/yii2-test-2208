@@ -4,7 +4,7 @@ use app\models\Customer;
 use app\models\obj\Call;
 use app\models\obj\Sms;
 use yii\helpers\Html;
-use app\widgets\HistoryList\helpers\HistoryListHelper;
+// Использование хелпера переехало в _item_common
 
 /* @var $model \app\models\search\HistorySearch */
 
@@ -12,42 +12,39 @@ switch ($model->event) {
     case History::EVENT_CREATED_TASK:
     case History::EVENT_COMPLETED_TASK:
     case History::EVENT_UPDATED_TASK:
-        $task = $model->task;
+        /* @var $task \app\models\obj\Task */
+        $task = $model->objTask;
 
         echo $this->render('_item_common', [
-            'user' => $model->user,
-            'body' => HistoryListHelper::getBodyByModel($model),
+            // Убрал повторяющуюся передачу параметров, зависящих от $model
+            // Вместо этого, всё нужное извлекается сразу в шаблоне _item_common
+            'history' => $model,
             'iconClass' => 'fa-check-square bg-yellow',
-            'footerDatetime' => $model->ins_ts,
             'footer' => isset($task->customerCreditor->name) ? "Creditor: " . $task->customerCreditor->name : ''
         ]);
         break;
     
     case History::EVENT_INCOMING_SMS:
     case History::EVENT_OUTGOING_SMS:
+        /* @var $task \app\models\obj\Sms */
+        $sms = $model->objSms;
         echo $this->render('_item_common', [
-            'user' => $model->user,
-            'body' => HistoryListHelper::getBodyByModel($model),
-            'footer' => $model->sms->direction == Sms::DIRECTION_INCOMING ?
-                Yii::t('app', 'Incoming message from {number}', [
-                    'number' => $model->sms->phone_from ?? ''
-                ]) : Yii::t('app', 'Sent message to {number}', [
-                    'number' => $model->sms->phone_to ?? ''
-                ]),
-            'iconIncome' => $model->sms->direction == Sms::DIRECTION_INCOMING,
-            'footerDatetime' => $model->ins_ts,
+            'history' => $model,
+            'footer' => empty($sms) ? '' :($sms->direction == Sms::DIRECTION_INCOMING
+                ? Yii::t('app', 'Incoming message from {number}', ['number' => $sms->phone_from ?? ''])
+                : Yii::t('app', 'Sent message to {number}'      , ['number' => $sms->phone_to ?? ''])),
+            // iconIncome - не используется в шаблоне _item_common, удаляем
             'iconClass' => 'icon-sms bg-dark-blue'
         ]);
         break;
     
     case History::EVENT_OUTGOING_FAX:
     case History::EVENT_INCOMING_FAX:
-        $fax = $model->fax;
-
+        /* @var $task \app\models\obj\Fax */
+        $fax = $model->objFax;
         echo $this->render('_item_common', [
-            'user' => $model->user,
-            'body' => HistoryListHelper::getBodyByModel($model) .
-                ' - ' .
+            'history' => $model,
+            'afterBody' => ' - ' .
                 (isset($fax->document) ? Html::a(
                     Yii::t('app', 'view document'),
                     $fax->document->getViewUrl(),
@@ -58,9 +55,10 @@ switch ($model->event) {
                 ) : ''),
             'footer' => Yii::t('app', '{type} was sent to {group}', [
                 'type' => $fax ? $fax->getTypeText() : 'Fax',
-                'group' => isset($fax->creditorGroup) ? Html::a($fax->creditorGroup->name, ['creditors/groups'], ['data-pjax' => 0]) : ''
+                // Свойство $fax->creditorGroup не существует, поэтому пока что смело
+                // выбрасываем код, либо тогда уже дописываем извлечение creditorGroup
+                'group' => ''
             ]),
-            'footerDatetime' => $model->ins_ts,
             'iconClass' => 'fa-fax bg-green'
         ]);
         break;
@@ -84,25 +82,21 @@ switch ($model->event) {
     case History::EVENT_INCOMING_CALL:
     case History::EVENT_OUTGOING_CALL:
         /** @var Call $call */
-        $call = $model->call;
+        $call = $model->objCall;
         $answered = $call && $call->status == Call::STATUS_ANSWERED;
 
         echo $this->render('_item_common', [
-            'user' => $model->user,
+            'history' => $model,
             'content' => $call->comment ?? '',
-            'body' => HistoryListHelper::getBodyByModel($model),
-            'footerDatetime' => $model->ins_ts,
-            'footer' => isset($call->applicant) ? "Called <span>{$call->applicant->name}</span>" : null,
+            // $call->applicant не существует поэтому удаляем footer
             'iconClass' => $answered ? 'md-phone bg-green' : 'md-phone-missed bg-red',
-            'iconIncome' => $answered && $call->direction == Call::DIRECTION_INCOMING
+            // 'iconIncome' - не используется, удаляем
         ]);
         break;
     
     default:
         echo $this->render('_item_common', [
-            'user' => $model->user,
-            'body' => HistoryListHelper::getBodyByModel($model),
-            'bodyDatetime' => $model->ins_ts,
+            'history' => $model,
             'iconClass' => 'fa-gear bg-purple-light'
         ]);
         break;

@@ -5,6 +5,7 @@ namespace app\models;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use app\components\DynObjBehavior;
 
 /**
  * This is the model class for table "{{%history}}".
@@ -24,9 +25,15 @@ use yii\db\ActiveRecord;
  * @property-read Customer $customer
  * @property-read User $user
  *
- * // Не забываем перечислять все возможные классы связанные с объектами
- * // Чтобы в будущем свойства класса History не пересекались с названиями объектов
- * // к названию объектов добавляем префикс, например obj
+ * Не забываем перечислять все возможные классы связанные с объектами для автодополнения кода.
+ * Чтобы в будущем свойства класса History не пересекались с названиями объектов
+ *       к названию объектов добавляем префикс, например obj
+ * 
+ * После того, как будет обеспечена однозначная зависимость object от event
+ *       можно оставить только свойство obj, вместо остальных. Сейчас пока нет
+ *       гарантии, что для event == 'created_task' не окажется, что object == 'sms'
+ *       Поэтому для event == 'created_task' следует прямо вызывать objSms,
+ *       в крайнем случае мы получим null
  * 
  * @property-read obj\Task $objTask
  * @property-read obj\Sms  $objSms
@@ -36,9 +43,6 @@ use yii\db\ActiveRecord;
  */
 class History extends ActiveRecord
 {
-    const NS_OBJECT_CLASS = 'app\\models\\obj\\';
-    const PREFIX_OBJ_RELATION = 'obj';
-
     const EVENT_CREATED_TASK = 'created_task';
     const EVENT_UPDATED_TASK = 'updated_task';
     const EVENT_COMPLETED_TASK = 'completed_task';
@@ -129,6 +133,29 @@ class History extends ActiveRecord
     }
 
     /**
+     * @inheritdoc
+     */
+    public function behaviors() {
+        return [
+            'DynObjBehavior' => [
+                /**
+                 * Поведение обеспечивает доступ к объектам на лету:
+                 * objCall, objFax, objSms, objTask, ... 
+                 */
+                'class' => DynObjBehavior::class,
+            ],
+        ];
+    }
+    
+    /**
+     * @inheritdoc
+     */
+    public function afterRefresh() {
+        $this->_details = null;
+        parent::afterRefresh();
+    }
+    
+    /**
      * Метки атрибутов
      * 
      * Т.к. атрибутов не много, то эти метки можно не кешировать :)
@@ -167,34 +194,16 @@ class History extends ActiveRecord
     }
 
     /**
-     * Динамическое подключение реляционного объекта по имени
-     * 
-     * За одно избавляемся от ObjectNameTrait, т.к. использовался только в History
-     * 
-     * @inheritdoc
-     */
-    public function getRelation($name, $throwException = true)
-    {        
-        //if (substr($name,0,3) !== self::PREFIX_OBJ_RELATION) {
-        //    return parent::getRelation($name, $throwException);
-        //}
-        //$class = substr($name,3);
-        $class = $name;
-        $class = self::NS_OBJECT_CLASS . ucfirst($class);
-        if (class_exists($class)) {
-            return $this->hasOne($class, ['id' => 'object_id']);
-        }
-        return parent::getRelation($name, $throwException);
-    }
-
-    /**
      * Отложенное подключение реляционного объекта по значению поля object
      * 
      * @return ActiveQuery
      */
     public function getObj() {
-        $class = self::NS_OBJECT_CLASS . ucfirst($this->getAttribute('object'));
-        return $this->hasOne($class, ['id' => 'user_id']);
+        $class = DynObjBehavior::NS_OBJECT_CLASS . ucfirst($this->getAttribute('object'));
+        if (class_exists($class)) {
+            return $this->hasOne($class, ['id' => 'object_id']);
+        }
+        return null;
     }
     
     /**
@@ -203,8 +212,6 @@ class History extends ActiveRecord
      * При большом числе событий вызов может оказаться не таким уж быстрым
      * и так как полученные с помошью Yii::t() названия не кешируются
      * то при каждом вызове весь массив будет пересчитываться заново
-     * 
-     * Я пошёл по пути отложенного вызова Yii::t()
      * 
      * @return array
      */
@@ -223,6 +230,8 @@ class History extends ActiveRecord
 
     /**
      * Кеширует и возвращает переведенное название для события
+     * 
+     * Я пошёл по пути отложенного вызова Yii::t(), вместо получения всего списка
      * 
      * @param string $event
      * @return string

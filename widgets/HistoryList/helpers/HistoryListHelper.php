@@ -14,12 +14,13 @@ class HistoryListHelper
             case History::EVENT_CREATED_TASK:
             case History::EVENT_COMPLETED_TASK:
             case History::EVENT_UPDATED_TASK:
-                $task = $model->task;
+                $task = $model->objTask;
                 return "$model->eventText: " . ($task->title ?? '');
                 
             case History::EVENT_INCOMING_SMS:
             case History::EVENT_OUTGOING_SMS:
-                return $model->sms->message ? $model->sms->message : '';
+                $sms = $model->objSms;
+                return $sms ? $sms->message : '';
                 
             case History::EVENT_OUTGOING_FAX:
             case History::EVENT_INCOMING_FAX:
@@ -38,7 +39,7 @@ class HistoryListHelper
             case History::EVENT_INCOMING_CALL:
             case History::EVENT_OUTGOING_CALL:
                 /** @var Call $call */
-                $call = $model->call;
+                $call = $model->objCall;
                 return ($call ? $call->totalStatusText . ($call->getTotalDisposition(false) ? " <span class='text-grey'>" . $call->getTotalDisposition(false) . "</span>" : "") : '<i>Deleted</i> ');
                 
             default:

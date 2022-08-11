@@ -9,10 +9,6 @@ use app\models\ObjCustomer;
 /**
  * This is the model class for table "{{%task}}".
  *
- * @property integer $id
- * @property integer $user_id
- * @property integer $customer_id
- * @property integer $status
  * @property string $title
  * @property string $text
  * @property string $due_date

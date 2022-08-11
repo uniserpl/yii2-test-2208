@@ -1,23 +1,31 @@
 <?php
 
-use app\models\User;
 use yii\helpers\Html;
+use app\widgets\DateTime\DateTime;
+use app\widgets\HistoryList\helpers\HistoryListHelper;
 
-/* @var $user User */
-/* @var $body string */
+/* @var $history \app\models\History */
+/* @var $user \app\models\User */
+/* @var $afterBody string */
 /* @var $footer string */
 /* @var $footerDatetime string */
 /* @var $bodyDatetime string */
 /* @var $iconClass string */
+
+// Вместо передачи отдельно в каждом случае: user, ins_ts, а также body,
+//     лучше передать в шаблон сразу $history и извлечь их на месте
+$user = $history->user;
+$footerDatetime = $history->ins_ts;
+
 ?>
 <?php echo Html::tag('i', '', ['class' => "icon icon-circle icon-main white $iconClass"]); ?>
 
     <div class="bg-success ">
-        <?php echo $body ?>
+        <?php echo HistoryListHelper::getBodyByModel($history) . (isset($afterBody) ? $afterBody : '') ?>
 
         <?php if (isset($bodyDatetime)): ?>
             <span>
-       <?= \app\widgets\DateTime\DateTime::widget(['dateTime' => $bodyDatetime]) ?>
+       <?= DateTime::widget(['dateTime' => $bodyDatetime]) ?>
     </span>
         <?php endif; ?>
     </div>
@@ -36,7 +44,7 @@ use yii\helpers\Html;
     <div class="bg-warning">
         <?php echo isset($footer) ? $footer : '' ?>
         <?php if (isset($footerDatetime)): ?>
-            <span><?= \app\widgets\DateTime\DateTime::widget(['dateTime' => $footerDatetime]) ?></span>
+            <span><?= DateTime::widget(['dateTime' => $footerDatetime]) ?></span>
         <?php endif; ?>
     </div>
 <?php endif; ?>
