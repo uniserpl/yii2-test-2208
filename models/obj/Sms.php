@@ -10,33 +10,33 @@ use app\models\ObjCustomer;
  * This is the model class for table "{{%sms}}".
  *
  * Свойства type не существует, удаляем из списка
- * 
+ *
  * phone_to и direction в правилах required, а в БД м.б. null, следует синхронизировать
- * 
+ *
  * @property string|null $phone_from
  * @property string $phone_to
  * @property string|null $message
  * @property int $direction
- * 
+ *
  * @property-read string $directionText
  */
 class Sms extends ObjCustomer
 {
-    const DIRECTION_INCOMING = 0;
-    const DIRECTION_OUTGOING = 1;
+    public const DIRECTION_INCOMING = 0;
+    public const DIRECTION_OUTGOING = 1;
 
     // incoming
-    const STATUS_NEW = 0;
-    const STATUS_READ = 1;
-    const STATUS_ANSWERED = 2;
+    public const STATUS_NEW = 0;
+    public const STATUS_READ = 1;
+    public const STATUS_ANSWERED = 2;
 
     // outgoing
-    const STATUS_DRAFT = 10;
-    const STATUS_WAIT = 11;
-    const STATUS_SENT = 12;
-    const STATUS_DELIVERED = 13;
-    const STATUS_FAILED = 14;
-    const STATUS_SUCCESS = 13;
+    public const STATUS_DRAFT = 10;
+    public const STATUS_WAIT = 11;
+    public const STATUS_SENT = 12;
+    public const STATUS_DELIVERED = 13;
+    public const STATUS_FAILED = 14;
+    public const STATUS_SUCCESS = 13;
 
 
     /**

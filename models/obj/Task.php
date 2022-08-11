@@ -14,7 +14,7 @@ use app\models\ObjCustomer;
  * @property string|null $text
  * @property string|null $due_date
  * @property int|null $priority
- * 
+ *
  * @property string $title
  * @property string $text
  * @property string $due_date
@@ -30,9 +30,9 @@ use app\models\ObjCustomer;
  */
 class Task extends ObjCustomer
 {
-    const STATUS_NEW = 0;
-    const STATUS_DONE = 1;
-    const STATUS_CANCEL = 3;
+    public const STATUS_NEW = 0;
+    public const STATUS_DONE = 1;
+    public const STATUS_CANCEL = 3;
 
     /**
      * @inheritdoc

@@ -10,33 +10,35 @@ use app\models\ObjBasic;
  * This is the model class for table "fax".
  *
  * status отсутствует среди полей - удалил и здесь
- * 
+ *
  * @property string $ins_ts
  * @property string|null $from
  * @property string|null $to
  * @property int $direction
  * @property string|null $type
  * @property string $typeText
- * 
+ *
  */
-class Fax extends ObjBasic {
-
-    const DIRECTION_INCOMING = 0;
-    const DIRECTION_OUTGOING = 1;
-    const TYPE_POA_ATC = 'poa_atc';
-    const TYPE_REVOCATION_NOTICE = 'revocation_notice';
+class Fax extends ObjBasic
+{
+    public const DIRECTION_INCOMING = 0;
+    public const DIRECTION_OUTGOING = 1;
+    public const TYPE_POA_ATC = 'poa_atc';
+    public const TYPE_REVOCATION_NOTICE = 'revocation_notice';
 
     /**
      * @inheritdoc
      */
-    public static function tableName() {
+    public static function tableName()
+    {
         return '{{%fax}}';
     }
 
     /**
      * @inheritdoc
      */
-    public function rules() {
+    public function rules()
+    {
         return ArrayHelper::merge(
             parent::rules(),
             [
@@ -51,7 +53,8 @@ class Fax extends ObjBasic {
     /**
      * @inheritdoc
      */
-    public function attributeLabels() {
+    public function attributeLabels()
+    {
         return ArrayHelper::merge(
             parent::attributeLabels(),
             [
@@ -68,7 +71,8 @@ class Fax extends ObjBasic {
     /**
      * @return array
      */
-    public static function getTypeTexts() {
+    public static function getTypeTexts()
+    {
         return [
             self::TYPE_POA_ATC => Yii::t('app', 'POA/ATC'),
             self::TYPE_REVOCATION_NOTICE => Yii::t('app', 'Revocation'),
@@ -78,8 +82,8 @@ class Fax extends ObjBasic {
     /**
      * @return mixed|string
      */
-    public function getTypeText() {
+    public function getTypeText()
+    {
         return self::getTypeTexts()[$this->type] ?? $this->type;
     }
-
 }

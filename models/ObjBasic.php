@@ -8,11 +8,11 @@ use yii\db\ActiveRecord;
 
 /**
  * Суперкласс любого объекта (history.object)
- *    
+ *
  * @see Fax
- * 
+ *
  * ObjBasic также расширяется с помощью класса ObjCustomer
- * 
+ *
  * @property int $id
  * @property int|null $user_id
  *
@@ -50,5 +50,4 @@ abstract class ObjBasic extends ActiveRecord
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
-
 }

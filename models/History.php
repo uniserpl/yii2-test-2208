@@ -28,13 +28,13 @@ use app\components\DynObjBehavior;
  * Не забываем перечислять все возможные классы связанные с объектами для автодополнения кода.
  * Чтобы в будущем свойства класса History не пересекались с названиями объектов
  *       к названию объектов добавляем префикс, например obj
- * 
+ *
  * После того, как будет обеспечена однозначная зависимость object от event
  *       можно оставить только свойство obj, вместо остальных. Сейчас пока нет
  *       гарантии, что для event == 'created_task' не окажется, что object == 'sms'
  *       Поэтому для event == 'created_task' следует прямо вызывать objSms,
  *       в крайнем случае мы получим null
- * 
+ *
  * @property-read obj\Task $objTask
  * @property-read obj\Sms  $objSms
  * @property-read obj\Call $objCall
@@ -43,32 +43,32 @@ use app\components\DynObjBehavior;
  */
 class History extends ActiveRecord
 {
-    const EVENT_CREATED_TASK = 'created_task';
-    const EVENT_UPDATED_TASK = 'updated_task';
-    const EVENT_COMPLETED_TASK = 'completed_task';
+    public const EVENT_CREATED_TASK = 'created_task';
+    public const EVENT_UPDATED_TASK = 'updated_task';
+    public const EVENT_COMPLETED_TASK = 'completed_task';
 
-    const EVENT_INCOMING_SMS = 'incoming_sms';
-    const EVENT_OUTGOING_SMS = 'outgoing_sms';
+    public const EVENT_INCOMING_SMS = 'incoming_sms';
+    public const EVENT_OUTGOING_SMS = 'outgoing_sms';
 
-    const EVENT_INCOMING_CALL = 'incoming_call';
-    const EVENT_OUTGOING_CALL = 'outgoing_call';
+    public const EVENT_INCOMING_CALL = 'incoming_call';
+    public const EVENT_OUTGOING_CALL = 'outgoing_call';
 
-    const EVENT_INCOMING_FAX = 'incoming_fax';
-    const EVENT_OUTGOING_FAX = 'outgoing_fax';
+    public const EVENT_INCOMING_FAX = 'incoming_fax';
+    public const EVENT_OUTGOING_FAX = 'outgoing_fax';
 
-    const EVENT_CUSTOMER_CHANGE_TYPE = 'customer_change_type';
-    const EVENT_CUSTOMER_CHANGE_QUALITY = 'customer_change_quality';
-    
+    public const EVENT_CUSTOMER_CHANGE_TYPE = 'customer_change_type';
+    public const EVENT_CUSTOMER_CHANGE_QUALITY = 'customer_change_quality';
+
     /**
      * Карта событий и связанных с ними текстовых ресурсов
-     * 
-     * Сосредотачиваем в одном месте все события, 
+     *
+     * Сосредотачиваем в одном месте все события,
      *    чтобы легче было сопровождать
-     * 
+     *
      * Раз событий больше 150, то может имеет смысл вынести их в отдельную таблицу,
      *    но это зависит от задач которые завязаны на эти события.
      *    В данном коде такой необходимости ещё не видно.
-     * 
+     *
      * @var string[]
      */
     private static $_events = [
@@ -84,30 +84,30 @@ class History extends ActiveRecord
 
         self::EVENT_INCOMING_FAX => 'Incoming fax',
         self::EVENT_OUTGOING_FAX => 'Outgoing fax',
-        
+
         self::EVENT_CUSTOMER_CHANGE_TYPE => 'Type changed',
         self::EVENT_CUSTOMER_CHANGE_QUALITY => 'Property changed',
     ];
 
     /**
      * Кеш переведенных текстовых ресурсов для событий
-     * 
+     *
      * Сейчас оптимизированно для случая, когда во время обработки запроса
      * язык считается неизменным.
-     * Такой кеш надо переделывать для админки, когда потребуется перевод событий 
+     * Такой кеш надо переделывать для админки, когда потребуется перевод событий
      * сразу на несколько языков
-     * 
+     *
      * @var string[]
      */
     private static $_eventsLabel = [];
-            
+
     /**
      * Декодированное поле detail
-     * 
+     *
      * @var \stdClass|null
      */
     private $_details;
-    
+
     /**
      * @inheritdoc
      */
@@ -135,31 +135,33 @@ class History extends ActiveRecord
     /**
      * @inheritdoc
      */
-    public function behaviors() {
+    public function behaviors()
+    {
         return [
             'DynObjBehavior' => [
                 /**
                  * Поведение обеспечивает доступ к объектам на лету:
-                 * objCall, objFax, objSms, objTask, ... 
+                 * objCall, objFax, objSms, objTask, ...
                  */
                 'class' => DynObjBehavior::class,
             ],
         ];
     }
-    
+
     /**
      * @inheritdoc
      */
-    public function afterRefresh() {
+    public function afterRefresh()
+    {
         $this->_details = null;
         parent::afterRefresh();
     }
-    
+
     /**
      * Метки атрибутов
-     * 
+     *
      * Т.к. атрибутов не много, то эти метки можно не кешировать :)
-     * 
+     *
      * @inheritdoc
      */
     public function attributeLabels()
@@ -195,44 +197,45 @@ class History extends ActiveRecord
 
     /**
      * Отложенное подключение реляционного объекта по значению поля object
-     * 
+     *
      * @return ActiveQuery
      */
-    public function getObj() {
+    public function getObj()
+    {
         $class = DynObjBehavior::NS_OBJECT_CLASS . ucfirst($this->getAttribute('object'));
         if (class_exists($class)) {
             return $this->hasOne($class, ['id' => 'object_id']);
         }
         return null;
     }
-    
+
     /**
      * Карта всех событий
-     * 
+     *
      * При большом числе событий вызов может оказаться не таким уж быстрым
      * и так как полученные с помошью Yii::t() названия не кешируются
      * то при каждом вызове весь массив будет пересчитываться заново
-     * 
+     *
      * @return array
      */
     public static function getEventTexts()
     {
         $map = & self::$_eventsLabel;
-        array_walk(self::$_events, function ($label,$event) use (&$map) {
+        array_walk(self::$_events, function ($label, $event) use (&$map) {
             // Не делаем лишних вызовов Yii::t()
             if (!array_key_exists($event, $map)) {
                 $map[$event] = Yii::t('app', $label);
             }
         });
-        
+
         return self::$_eventsLabel;
     }
 
     /**
      * Кеширует и возвращает переведенное название для события
-     * 
+     *
      * Я пошёл по пути отложенного вызова Yii::t(), вместо получения всего списка
-     * 
+     *
      * @param string $event
      * @return string
      */
@@ -240,8 +243,7 @@ class History extends ActiveRecord
     {
         if (array_key_exists($event, self::$_eventsLabel)) {
             return self::$_eventsLabel[$event];
-        } else
-        if (array_key_exists($event, self::$_events)) {
+        } elseif (array_key_exists($event, self::$_events)) {
             return self::$_eventsLabel[$event] = Yii::t('app', self::$_events[$event]);
         } else {
             return $event;
@@ -250,7 +252,7 @@ class History extends ActiveRecord
 
     /**
      * Возвращает переведенное название для события
-     * 
+     *
      * @return string
      */
     public function getEventText()
@@ -262,16 +264,17 @@ class History extends ActiveRecord
     /**
      * Возвращает атрибут из поля detail
      * При этом кешируем декодированное поле detail
-     * 
+     *
      * @param string $attribute
      */
-    private function _detail($attribute) {
+    private function _detail($attribute)
+    {
         if (is_null($this->_details)) {
             $this->_details = json_decode($this->detail);
         }
         return isset($this->_details->{$attribute}) ? $this->_details->{$attribute} : null;
     }
-    
+
     /**
      * @param string $attribute
      * @return mixed|null

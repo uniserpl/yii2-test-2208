@@ -9,10 +9,10 @@ use yii\db\ActiveQuery;
  * Суперкласс любого объекта (history.object) содержащего кастомера и статус
  *
  * @see Sms, Task, Call
- * 
+ *
  * @property int $status
  * @property int $customer_id
- * 
+ *
  * @property-read string $statusText
  * @property-read Customer $customer
  */
@@ -56,13 +56,13 @@ abstract class ObjCustomer extends ObjBasic
     {
         return $this->hasOne(Customer::class, ['id' => 'customer_id']);
     }
-    
+
     /**
-     * 
+     *
      * @return string[]
      */
     abstract public static function getStatusTexts();
-    
+
     /**
      * @param int $value
      * @return string
@@ -79,5 +79,4 @@ abstract class ObjCustomer extends ObjBasic
     {
         return self::getStatusTextByValue($this->status);
     }
-
 }

@@ -12,7 +12,7 @@ use app\models\ObjCustomer;
  * @property int $direction
  * @property string $ins_ts
  * @property string|null $comment
- * 
+ *
  * следующие свойства в БД м.б. null, следует синхронизировать с rules
  * @property string $phone_from
  * @property string $phone_to
@@ -22,16 +22,16 @@ use app\models\ObjCustomer;
  * @property-read string $fullDirectionText
  * @property-read string $totalDisposition
  * @property-read string $totalStatusText
- * 
+ *
  * directionText - не существующее свойство, удалил из property-read
  */
 class Call extends ObjCustomer
 {
-    const STATUS_NO_ANSWERED = 0;
-    const STATUS_ANSWERED = 1;
+    public const STATUS_NO_ANSWERED = 0;
+    public const STATUS_ANSWERED = 1;
 
-    const DIRECTION_INCOMING = 0;
-    const DIRECTION_OUTGOING = 1;
+    public const DIRECTION_INCOMING = 0;
+    public const DIRECTION_OUTGOING = 1;
 
     public $duration = 720;
 
@@ -76,7 +76,7 @@ class Call extends ObjCustomer
                 'phone_from' => Yii::t('app', 'Caller Phone'),
                 'phone_to' => Yii::t('app', 'Dialed Phone'),
                 'directionText' => Yii::t('app', 'Direction'),
-                
+
                 // 'comment' и здесь забыли добавить
                 'comment' => Yii::t('app', 'Comment'),
             ]
@@ -97,7 +97,7 @@ class Call extends ObjCustomer
      */
     public function getDurationText()
     {
-        // Переворачиваем условие, улучшаем читабельность 
+        // Переворачиваем условие, улучшаем читабельность
         if (empty($this->duration)) {
             return '00:00';
         }
@@ -111,11 +111,9 @@ class Call extends ObjCustomer
     {
         // Упрощаем логику, чтобы легче читался код
         if ($this->status == self::STATUS_NO_ANSWERED) {
-            
             if ($this->direction == self::DIRECTION_INCOMING) {
                 return Yii::t('app', 'Missed Call');
-            } else 
-            if ($this->direction == self::DIRECTION_OUTGOING) {
+            } elseif ($this->direction == self::DIRECTION_OUTGOING) {
                 return Yii::t('app', 'Client No Answer');
             }
         }
@@ -131,12 +129,13 @@ class Call extends ObjCustomer
 
     /**
      * Заглушка для абстрактного метода
-     * 
+     *
      * вместо getStatusText() в модели используется getTotalStatusText()
-     * 
+     *
      * @return type
      */
-    public static function getStatusTexts() {
+    public static function getStatusTexts()
+    {
         return [];
     }
 
@@ -168,5 +167,4 @@ class Call extends ObjCustomer
     {
         return self::getFullDirectionTexts()[$this->direction] ?? $this->direction;
     }
-
 }
