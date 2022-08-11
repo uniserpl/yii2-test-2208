@@ -28,7 +28,13 @@ abstract class ObjCustomer extends ObjBasic
             [
                 [['customer_id', 'status'], 'required'],
                 [['customer_id', 'status'], 'integer'],
-                [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Customer::class, 'targetAttribute' => ['customer_id' => 'id']],
+                [
+                    ['customer_id'],
+                    'exist',
+                    'skipOnError' => true,
+                    'targetClass' => Customer::class,
+                    'targetAttribute' => ['customer_id' => 'id']
+                ],
             ]
         );
     }

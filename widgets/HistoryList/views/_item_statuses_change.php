@@ -18,11 +18,11 @@ use app\models\History;
         <span><?= \app\widgets\DateTime\DateTime::widget(['dateTime' => $model->ins_ts]) ?></span>
     </div>
 
-<?php if (isset($model->user)): ?>
+<?php if (isset($model->user)) : ?>
     <div class="bg-info"><?= $model->user->username; ?></div>
 <?php endif; ?>
 
-<?php if (isset($content) && $content): ?>
+<?php if (isset($content) && $content) : ?>
     <div class="bg-info">
         <?php echo $content ?>
     </div>

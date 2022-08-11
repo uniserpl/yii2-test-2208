@@ -17,7 +17,7 @@ use app\models\ObjCustomer;
  * @property string $phone_from
  * @property string $phone_to
  *
- * @property-read string $client_phone
+ * @property-read string $clientPhone
  * @property-read string $durationText
  * @property-read string $fullDirectionText
  * @property-read string $totalDisposition
@@ -85,9 +85,10 @@ class Call extends ObjCustomer
 
 
     /**
+     * Исправил название ради camel caps format
      * @return string
      */
-    public function getClient_phone()
+    public function getClientPhone()
     {
         return $this->direction == self::DIRECTION_INCOMING ? $this->phone_from : $this->phone_to;
     }

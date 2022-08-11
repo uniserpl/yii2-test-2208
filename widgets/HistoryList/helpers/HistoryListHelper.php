@@ -38,9 +38,19 @@ class HistoryListHelper
 
             case History::EVENT_INCOMING_CALL:
             case History::EVENT_OUTGOING_CALL:
+                // Улучшаем читабельность длинной строки
                 /** @var Call $call */
                 $call = $model->objCall;
-                return ($call ? $call->totalStatusText . ($call->getTotalDisposition(false) ? " <span class='text-grey'>" . $call->getTotalDisposition(false) . "</span>" : "") : '<i>Deleted</i> ');
+                if (empty($call)) {
+                    return '<i>Deleted</i> ';
+                }
+                return $call->totalStatusText . (
+                    $call->getTotalDisposition(false)
+                    ? " <span class='text-grey'>"
+                        . $call->getTotalDisposition(false)
+                        . "</span>"
+                    : ""
+                );
 
             default:
                 return $model->eventText;
