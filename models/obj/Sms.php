@@ -3,18 +3,22 @@
 namespace app\models\obj;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 use app\models\ObjCustomer;
 
 /**
  * This is the model class for table "{{%sms}}".
  *
- * @property string $phone_from
- * @property string $message
- * @property integer $direction
+ * Свойства type не существует, удаляем из списка
+ * 
+ * phone_to и direction в правилах required, а в БД м.б. null, следует синхронизировать
+ * 
+ * @property string|null $phone_from
  * @property string $phone_to
- * @property integer $type
- *
- * @property string $directionText
+ * @property string|null $message
+ * @property int $direction
+ * 
+ * @property-read string $directionText
  */
 class Sms extends ObjCustomer
 {
@@ -51,8 +55,9 @@ class Sms extends ObjCustomer
         return ArrayHelper::merge(
             parent::rules(),
             [
+                // удаляем из правил несуществующие в БД поля: 'applicant_id', 'type'
                 [['phone_to', 'direction'], 'required'],
-                [['direction', 'applicant_id', 'type'], 'integer'],
+                [['direction'], 'integer'],
                 [['message'], 'string'],
                 [['phone_from', 'phone_to'], 'string', 'max' => 255],
             ]

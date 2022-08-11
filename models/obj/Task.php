@@ -3,37 +3,36 @@
 namespace app\models\obj;
 
 use Yii;
-use yii\db\ActiveQuery;
+use yii\helpers\ArrayHelper;
 use app\models\ObjCustomer;
 
 /**
  * This is the model class for table "{{%task}}".
  *
+ * @property int $user_id
+ * @property string $title
+ * @property string|null $text
+ * @property string|null $due_date
+ * @property int|null $priority
+ * 
  * @property string $title
  * @property string $text
  * @property string $due_date
  * @property integer $priority
  * @property string $ins_ts
  *
- * @property string $stateText
- * @property string $state
- * @property string $subTitle
+ * @property-read boolean $isOverdue
+ * @property-read boolean $isDone
  *
- * @property boolean $isOverdue
- * @property boolean $isDone
- *
- * @property string $isInbox
- * @property string $statusText
+ * Т.к. нет поля state удаляем всё, что с ним связано
+ * включая константы и методы getStateTexts() getStateText()
+ * Так же не существует свойств subTitle и isInbox, удаляем из описания класса
  */
 class Task extends ObjCustomer
 {
     const STATUS_NEW = 0;
     const STATUS_DONE = 1;
     const STATUS_CANCEL = 3;
-
-    const STATE_INBOX  = 'inbox';
-    const STATE_DONE   = 'done';
-    const STATE_FUTURE = 'future';
 
     /**
      * @inheritdoc
@@ -51,10 +50,13 @@ class Task extends ObjCustomer
         return ArrayHelper::merge(
             parent::rules(),
             [
+                // Добавляем забытые поля status и due_date
+                // Убираем лишнее поле object
                 [['title'], 'required'],
-                [['priority'], 'integer'],
+                [['status', 'priority'], 'integer'],
                 [['text'], 'string'],
-                [['title', 'object'], 'string', 'max' => 255],
+                [['due_date'], 'safe'],
+                [['title'], 'string', 'max' => 255],
             ]
         );
     }
@@ -86,28 +88,6 @@ class Task extends ObjCustomer
             self::STATUS_CANCEL => Yii::t('app', 'Cancel'),
         ];
     }
-
-
-    /**
-     * @return array
-     */
-    public static function getStateTexts()
-    {
-        return [
-            self::STATE_INBOX => Yii::t('app', 'Inbox'),
-            self::STATE_DONE => Yii::t('app', 'Done'),
-            self::STATE_FUTURE => Yii::t('app', 'Future')
-        ];
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getStateText()
-    {
-        return self::getStateTexts()[$this->state] ?? $this->state;
-    }
-
 
     /**
      * @return bool

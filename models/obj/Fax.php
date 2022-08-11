@@ -9,13 +9,15 @@ use app\models\ObjBasic;
 /**
  * This is the model class for table "fax".
  *
- * @property string $from
- * @property string $to
- * @property integer $status
- * @property integer $direction
- * @property integer $type
+ * status отсутствует среди полей - удалил и здесь
+ * 
+ * @property string $ins_ts
+ * @property string|null $from
+ * @property string|null $to
+ * @property int $direction
+ * @property string|null $type
  * @property string $typeText
- *
+ * 
  */
 class Fax extends ObjBasic {
 
@@ -38,8 +40,10 @@ class Fax extends ObjBasic {
         return ArrayHelper::merge(
             parent::rules(),
             [
+                [['ins_ts'], 'safe'],
                 [['type'], 'required'],
-                [['from', 'to'], 'string'],
+                [['direction'], 'integer'],
+                [['from', 'to', 'type'], 'string', 'max' => 255],
             ]
         );
     }
@@ -51,8 +55,12 @@ class Fax extends ObjBasic {
         return ArrayHelper::merge(
             parent::attributeLabels(),
             [
+                'ins_ts' => Yii::t('app', 'Date'),
                 'from' => Yii::t('app', 'From'),
-                'to' => Yii::t('app', 'To')
+                'to' => Yii::t('app', 'To'),
+                // добавил забытые свойства
+                'direction' => Yii::t('app', 'Direction'),
+                'type' => Yii::t('app', 'Type'),
             ]
         );
     }

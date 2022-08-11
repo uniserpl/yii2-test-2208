@@ -3,23 +3,27 @@
 namespace app\models\obj;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 use app\models\ObjCustomer;
 
 /**
  * This is the model class for table "{{%call}}".
  *
- * @property integer $direction
+ * @property int $direction
+ * @property string $ins_ts
+ * @property string|null $comment
+ * 
+ * следующие свойства в БД м.б. null, следует синхронизировать с rules
  * @property string $phone_from
  * @property string $phone_to
- * @property string $comment
  *
- * -- magic properties
- * @property-read string $directionText
- * @property-read string $totalStatusText
- * @property-read string $totalDisposition
+ * @property-read string $client_phone
  * @property-read string $durationText
  * @property-read string $fullDirectionText
- * @property-read string $client_phone
+ * @property-read string $totalDisposition
+ * @property-read string $totalStatusText
+ * 
+ * directionText - не существующее свойство, удалил из property-read
  */
 class Call extends ObjCustomer
 {
@@ -47,9 +51,14 @@ class Call extends ObjCustomer
         return ArrayHelper::merge(
             parent::rules(),
             [
-                [['direction', 'phone_from', 'phone_to', 'type', 'viewed'], 'required'],
-                [['direction', 'type'], 'integer'],
-                [['phone_from', 'phone_to', 'outcome'], 'string', 'max' => 255],
+                // 'type', 'viewed', 'outcome' - не могут упоминаться в правилах
+                //  т.к. не существуют в БД и в модели
+                // 'comment' - наоборот, забыли упомянуть
+                [['ins_ts'], 'safe'],
+                [['direction', 'phone_from', 'phone_to'], 'required'],
+                [['direction'], 'integer'],
+                [['comment'], 'string'],
+                [['phone_from', 'phone_to'], 'string', 'max' => 255],
             ]
         );
     }
@@ -62,10 +71,14 @@ class Call extends ObjCustomer
         return ArrayHelper::merge(
             parent::rules(),
             [
+                'ins_ts' => Yii::t('app', 'Date'),
                 'direction' => Yii::t('app', 'Direction'),
-                'directionText' => Yii::t('app', 'Direction'),
                 'phone_from' => Yii::t('app', 'Caller Phone'),
                 'phone_to' => Yii::t('app', 'Dialed Phone'),
+                'directionText' => Yii::t('app', 'Direction'),
+                
+                // 'comment' и здесь забыли добавить
+                'comment' => Yii::t('app', 'Comment'),
             ]
         );
     }
@@ -118,6 +131,9 @@ class Call extends ObjCustomer
 
     /**
      * Заглушка для абстрактного метода
+     * 
+     * вместо getStatusText() в модели используется getTotalStatusText()
+     * 
      * @return type
      */
     public static function getStatusTexts() {

@@ -10,11 +10,11 @@ use yii\db\ActiveQuery;
  *
  * @see Sms, Task, Call
  * 
- * @property integer $status
- * @property string $statusText
+ * @property int $status
+ * @property int $customer_id
  * 
- * @property integer $customer_id
- * @property Customer $customer
+ * @property-read string $statusText
+ * @property-read Customer $customer
  */
 abstract class ObjCustomer extends ObjBasic
 {
@@ -26,7 +26,7 @@ abstract class ObjCustomer extends ObjBasic
         return ArrayHelper::merge(
             parent::rules(),
             [
-                [['status',], 'required'],
+                [['customer_id', 'status'], 'required'],
                 [['customer_id', 'status'], 'integer'],
                 [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Customer::class, 'targetAttribute' => ['customer_id' => 'id']],
             ]

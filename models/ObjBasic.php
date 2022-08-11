@@ -13,11 +13,10 @@ use yii\db\ActiveRecord;
  * 
  * ObjBasic также расширяется с помощью класса ObjCustomer
  * 
- * @property integer $id
- * @property string $ins_ts
- * @property integer $user_id
+ * @property int $id
+ * @property int|null $user_id
  *
- * @property User $user
+ * @property-read User $user
  */
 abstract class ObjBasic extends ActiveRecord
 {
@@ -27,10 +26,8 @@ abstract class ObjBasic extends ActiveRecord
     public function rules()
     {
         return [
-            [['id','user_id'], 'integer'],
-            [['user_id'], 'required'],
-            [['ins_ts'], 'safe'],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
+            [['user_id'], 'integer'],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
 
@@ -41,7 +38,6 @@ abstract class ObjBasic extends ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'ins_ts' => Yii::t('app', 'Date'),
             'user_id' => Yii::t('app', 'User ID'),
             'user.fullname' => Yii::t('app', 'User'),
         ];
