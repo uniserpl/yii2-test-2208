@@ -2,7 +2,7 @@
 
 return [
     'class' => 'yii\db\Connection',
-    'dsn' => 'mysql:host=americor-mysql;dbname=americor-test',
+    'dsn' => 'mysql:host=mysql;dbname=americor-test',
     'username' => 'root',
     'password' => 'root',
     'charset' => 'utf8',

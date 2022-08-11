@@ -35,7 +35,7 @@ ini_set('memory_limit', '2048M');
         [
             'label' => Yii::t('app', 'Type'),
             'value' => function (History $model) {
-                return $model->object;
+                return $model->getAttribute('object');
             }
         ],
         [

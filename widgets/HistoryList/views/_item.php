@@ -1,13 +1,12 @@
 <?php
-use app\models\Call;
-use app\models\Customer;
 use app\models\History;
-use app\models\search\HistorySearch;
-use app\models\Sms;
-use app\widgets\HistoryList\helpers\HistoryListHelper;
+use app\models\Customer;
+use app\models\obj\Call;
+use app\models\obj\Sms;
 use yii\helpers\Html;
+use app\widgets\HistoryList\helpers\HistoryListHelper;
 
-/** @var $model HistorySearch */
+/* @var $model \app\models\search\HistorySearch */
 
 switch ($model->event) {
     case History::EVENT_CREATED_TASK:
@@ -23,6 +22,7 @@ switch ($model->event) {
             'footer' => isset($task->customerCreditor->name) ? "Creditor: " . $task->customerCreditor->name : ''
         ]);
         break;
+    
     case History::EVENT_INCOMING_SMS:
     case History::EVENT_OUTGOING_SMS:
         echo $this->render('_item_common', [
@@ -39,6 +39,7 @@ switch ($model->event) {
             'iconClass' => 'icon-sms bg-dark-blue'
         ]);
         break;
+    
     case History::EVENT_OUTGOING_FAX:
     case History::EVENT_INCOMING_FAX:
         $fax = $model->fax;
@@ -63,6 +64,7 @@ switch ($model->event) {
             'iconClass' => 'fa-fax bg-green'
         ]);
         break;
+    
     case History::EVENT_CUSTOMER_CHANGE_TYPE:
         echo $this->render('_item_statuses_change', [
             'model' => $model,
@@ -70,6 +72,7 @@ switch ($model->event) {
             'newValue' => Customer::getTypeTextByType($model->getDetailNewValue('type'))
         ]);
         break;
+    
     case History::EVENT_CUSTOMER_CHANGE_QUALITY:
         echo $this->render('_item_statuses_change', [
             'model' => $model,
@@ -77,6 +80,7 @@ switch ($model->event) {
             'newValue' => Customer::getQualityTextByQuality($model->getDetailNewValue('quality')),
         ]);
         break;
+    
     case History::EVENT_INCOMING_CALL:
     case History::EVENT_OUTGOING_CALL:
         /** @var Call $call */
@@ -93,6 +97,7 @@ switch ($model->event) {
             'iconIncome' => $answered && $call->direction == Call::DIRECTION_INCOMING
         ]);
         break;
+    
     default:
         echo $this->render('_item_common', [
             'user' => $model->user,
