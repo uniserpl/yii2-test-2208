@@ -45,6 +45,9 @@ use app\components\DynObjBehavior;
  */
 class History extends ActiveRecord
 {
+    // Трейт ObjectNameTrait полностью выпилил, т.к. он не уменьшает кол-во кода
+    // Изменённая функциональность трейта теперь реализуется поведением DynObjBehavior
+    
     public const EVENT_CREATED_TASK = 'created_task';
     public const EVENT_UPDATED_TASK = 'updated_task';
     public const EVENT_COMPLETED_TASK = 'completed_task';
