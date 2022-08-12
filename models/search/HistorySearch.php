@@ -66,8 +66,6 @@ class HistorySearch extends History
         $query->with([
             'customer',
             'user',
-            // Избавляемся от перечисления всех возможных объектов
-            // Это стало не нужно благодаря поведению DynObjBehavior
         ]);
 
         return $dataProvider;
