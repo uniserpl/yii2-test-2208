@@ -32,7 +32,7 @@ use app\components\DynObjBehavior;
  * После того, как будет обеспечена однозначная зависимость object от event
  *       можно оставить только свойство obj, вместо остальных. Сейчас пока нет
  *       гарантии, что для event == 'created_task' не окажется, что object == 'sms'
- *       Поэтому для event == 'created_task' следует прямо вызывать objSms,
+ *       Поэтому для event == 'created_task' следует прямо вызывать objTask,
  *       в крайнем случае мы получим null
  *
  * @property-read obj\Task $objTask
