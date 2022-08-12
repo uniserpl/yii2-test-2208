@@ -18,9 +18,9 @@ use yii\db\ActiveRecord;
  */
 class User extends ActiveRecord
 {
-    const STATUS_DELETED = 0;
-    const STATUS_HIDDEN = 1;
-    const STATUS_ACTIVE = 10;
+    public const STATUS_DELETED = 0;
+    public const STATUS_HIDDEN = 1;
+    public const STATUS_ACTIVE = 10;
 
     /**
      * @inheritdoc
@@ -36,19 +36,11 @@ class User extends ActiveRecord
     public function rules()
     {
         return [
+            // Форматируем так же как и везде
             [['username', 'created_at', 'updated_at'], 'required'],
-            [[
-                'status',
-                'created_at',
-                'updated_at',
-            ], 'integer'],
-            [[
-                'username',
-                'email',
-            ], 'string', 'max' => 255],
-
+            [['status', 'created_at', 'updated_at'], 'integer'],
+            [['username', 'email'], 'string', 'max' => 255],
             [['username'], 'unique'],
-
             ['status', 'default', 'value' => self::STATUS_ACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED, self::STATUS_HIDDEN]],
         ];

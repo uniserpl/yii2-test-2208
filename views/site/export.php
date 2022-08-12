@@ -8,17 +8,9 @@
  */
 
 use app\models\History;
-use app\widgets\Export\Export;
-use app\widgets\HistoryList\helpers\HistoryListHelper;
+use app\widgets\Export\ExportCSV;
 
-$filename = 'history';
-$filename .= '-' . time();
-
-ini_set('max_execution_time', 0);
-ini_set('memory_limit', '2048M');
-?>
-
-<?= Export::widget([
+echo ExportCSV::widget([
     'dataProvider' => $dataProvider,
     'columns' => [
         [
@@ -35,7 +27,7 @@ ini_set('memory_limit', '2048M');
         [
             'label' => Yii::t('app', 'Type'),
             'value' => function (History $model) {
-                return $model->object;
+                return $model->getAttribute('object');
             }
         ],
         [
@@ -47,11 +39,13 @@ ini_set('memory_limit', '2048M');
         [
             'label' => Yii::t('app', 'Message'),
             'value' => function (History $model) {
-                return strip_tags(HistoryListHelper::getBodyByModel($model));
+                return trim(strip_tags(
+                    $this->render('//obj/bodies/' . $model->getObjName('unknown'), ['history' => $model])
+                ));
             }
         ]
     ],
-    'exportType' => $exportType,
     'batchSize' => 2000,
-    'filename' => $filename
+    'filename' => 'history-' . time(),
+    'timeout' => 0,
 ]);
