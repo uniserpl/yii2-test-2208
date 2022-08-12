@@ -8,7 +8,6 @@ use yii\web\Controller;
 
 class SiteController extends Controller
 {
-
     /**
      * {@inheritdoc}
      */
