@@ -18,8 +18,6 @@ echo $this->render('../_item_common', [
         ) : ''),
     'footer' => Yii::t('app', '{type} was sent to {group}', [
         'type' => $fax ? $fax->getTypeText() : 'Fax',
-        // Свойство $fax->creditorGroup не существует, поэтому пока что смело
-        // выбрасываем код, либо тогда уже дописываем извлечение creditorGroup
         'group' => ''
     ]),
     'iconClass' => 'fa-fax bg-green'

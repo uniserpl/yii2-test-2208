@@ -12,8 +12,6 @@ use app\widgets\DateTime\DateTime;
 /* @var $bodyDatetime string */
 /* @var $iconClass string */
 
-// Вместо передачи отдельно в каждом случае: user, ins_ts, а также body,
-//     лучше передать в шаблон сразу $history и извлечь их на месте
 $user = $history->user;
 $footerDatetime = $history->ins_ts;
 

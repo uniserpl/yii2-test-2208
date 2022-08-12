@@ -7,11 +7,6 @@ use yii\grid\GridView;
 /**
  * Экспорт гигантского CSV
  *
- * В данный момент цель ExportCSV выгрузить все данные,
- *     а не конкретную страницу, выбранную в браузере
- *
- * Расширяем класс GridView, т.к. в нём есть всё необходимое
- *
  * @property \yii\data\BaseDataProvider $dataProvider
  */
 class ExportCSV extends GridView
@@ -49,7 +44,6 @@ class ExportCSV extends GridView
     {
         $this->initPage();
 
-        // Доклеиваем расширение, если ещё нет.
         $filename = preg_replace(
             '/(.csv)?$/i',
             '.csv',

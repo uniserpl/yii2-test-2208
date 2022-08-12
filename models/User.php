@@ -36,7 +36,6 @@ class User extends ActiveRecord
     public function rules()
     {
         return [
-            // Форматируем так же как и везде
             [['username', 'created_at', 'updated_at'], 'required'],
             [['status', 'created_at', 'updated_at'], 'integer'],
             [['username', 'email'], 'string', 'max' => 255],

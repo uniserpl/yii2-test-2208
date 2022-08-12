@@ -12,6 +12,5 @@ echo $this->render('../_item_common', [
     'footer' => empty($sms) ? '' : ($sms->direction == Sms::DIRECTION_INCOMING
         ? Yii::t('app', 'Incoming message from {number}', ['number' => $sms->phone_from ?? ''])
         : Yii::t('app', 'Sent message to {number}', ['number' => $sms->phone_to ?? ''])),
-    // iconIncome - не используется в шаблоне _item_common, удаляем
     'iconClass' => 'icon-sms bg-dark-blue'
 ]);

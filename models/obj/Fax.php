@@ -9,8 +9,6 @@ use app\models\ObjBasic;
 /**
  * This is the model class for table "fax".
  *
- * status отсутствует среди полей - удалил и здесь
- *
  * @property string $ins_ts
  * @property string|null $from
  * @property string|null $to
@@ -61,7 +59,6 @@ class Fax extends ObjBasic
                 'ins_ts' => Yii::t('app', 'Date'),
                 'from' => Yii::t('app', 'From'),
                 'to' => Yii::t('app', 'To'),
-                // добавил забытые свойства
                 'direction' => Yii::t('app', 'Direction'),
                 'type' => Yii::t('app', 'Type'),
             ]

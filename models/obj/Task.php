@@ -23,10 +23,6 @@ use app\models\ObjCustomer;
  *
  * @property-read boolean $isOverdue
  * @property-read boolean $isDone
- *
- * Т.к. нет поля state удаляем всё, что с ним связано
- * включая константы и методы getStateTexts() getStateText()
- * Так же не существует свойств subTitle и isInbox, удаляем из описания класса
  */
 class Task extends ObjCustomer
 {
@@ -50,8 +46,6 @@ class Task extends ObjCustomer
         return ArrayHelper::merge(
             parent::rules(),
             [
-                // Добавляем забытые поля status и due_date
-                // Убираем лишнее поле object
                 [['title'], 'required'],
                 [['status', 'priority'], 'integer'],
                 [['text'], 'string'],

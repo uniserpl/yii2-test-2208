@@ -15,7 +15,7 @@ use app\components\DynObjBehavior;
  * @property integer $customer_id
  * @property integer $user_id
  * @property string $event
- * @property string $object От поля object надо избавиться, т.к. в php7.2 это ключевое слово
+ * @property string $object
  * @property integer $object_id
  * @property string $message
  * @property string $detail
@@ -24,16 +24,6 @@ use app\components\DynObjBehavior;
  *
  * @property-read Customer $customer
  * @property-read User $user
- *
- * Не забываем перечислять все возможные классы связанные с объектами для автодополнения кода.
- * Чтобы в будущем свойства класса History не пересекались с названиями объектов
- *       к названию объектов добавляем префикс, например obj
- *
- * После того, как будет обеспечена однозначная зависимость object от event
- *       можно оставить только свойство obj, вместо остальных. Сейчас пока нет
- *       гарантии, что для event == 'created_task' не окажется, что object == 'sms'
- *       Поэтому для event == 'created_task' следует прямо вызывать objTask,
- *       в крайнем случае мы получим null
  *
  * @property-read obj\Task $objTask
  * @property-read obj\Sms  $objSms
@@ -45,9 +35,6 @@ use app\components\DynObjBehavior;
  */
 class History extends ActiveRecord
 {
-    // Трейт ObjectNameTrait полностью выпилил, т.к. он не уменьшает кол-во кода
-    // Изменённая функциональность трейта теперь реализуется поведением DynObjBehavior
-    
     public const EVENT_CREATED_TASK = 'created_task';
     public const EVENT_UPDATED_TASK = 'updated_task';
     public const EVENT_COMPLETED_TASK = 'completed_task';
@@ -66,13 +53,6 @@ class History extends ActiveRecord
 
     /**
      * Карта событий и связанных с ними текстовых ресурсов
-     *
-     * Сосредотачиваем в одном месте все события,
-     *    чтобы легче было сопровождать
-     *
-     * Раз событий больше 150, то может имеет смысл вынести их в отдельную таблицу,
-     *    но это зависит от задач которые завязаны на эти события.
-     *    В данном коде такой необходимости ещё не видно.
      *
      * @var string[]
      */
@@ -122,11 +102,6 @@ class History extends ActiveRecord
     /**
      * Кеш переведенных текстовых ресурсов для событий
      *
-     * Сейчас оптимизированно для случая, когда во время обработки запроса
-     * язык считается неизменным.
-     * Такой кеш надо переделывать для админки, когда потребуется перевод событий
-     * сразу на несколько языков
-     *
      * @var string[]
      */
     private static $_eventsLabel = [];
@@ -157,8 +132,6 @@ class History extends ActiveRecord
             [['event'], 'required'],
             [['message', 'detail'], 'string'],
             [['event', 'object'], 'string', 'max' => 255],
-
-            // Слишком длинные строки разворачиваем
             [
                 ['customer_id'],
                 'exist',
@@ -197,16 +170,12 @@ class History extends ActiveRecord
      */
     public function afterRefresh()
     {
-        // После того как перечитали модель из БД
-        // сбрасываем кеш поля detail
         $this->_details = null;
         parent::afterRefresh();
     }
 
     /**
      * Метки атрибутов
-     *
-     * Т.к. атрибутов не много, то эти метки можно не кешировать :)
      *
      * @inheritdoc
      */
@@ -264,17 +233,13 @@ class History extends ActiveRecord
     /**
      * Карта всех событий
      *
-     * В старой версии при большом числе событий вызов может оказаться не таким уж быстрым
-     * и так как полученные с помошью Yii::t() названия не кешируются
-     * то при каждом вызове весь массив будет пересчитываться заново
-     *
      * @return array
      */
     public static function getEventTexts()
     {
         $map = & self::$_eventsLabel;
         array_walk(self::$_events, function ($label, $event) use (&$map) {
-            // Не делаем лишних вызовов Yii::t()
+            // create cache only if nedded
             if (!array_key_exists($event, $map)) {
                 $map[$event] = Yii::t('app', $label);
             }
@@ -286,16 +251,16 @@ class History extends ActiveRecord
     /**
      * Кеширует и возвращает переведенное название для события
      *
-     * Я пошёл по пути отложенного вызова Yii::t(), вместо получения всего списка
-     *
      * @param string $event
      * @return string
      */
     public static function getEventTextByEvent($event)
     {
         if (array_key_exists($event, self::$_eventsLabel)) {
+            // read cache
             return self::$_eventsLabel[$event];
         } elseif (array_key_exists($event, self::$_events)) {
+            // create cache
             return self::$_eventsLabel[$event] = Yii::t('app', self::$_events[$event]);
         } else {
             return $event;
@@ -315,13 +280,13 @@ class History extends ActiveRecord
 
     /**
      * Возвращает атрибут из поля detail
-     * При этом кешируем декодированное поле detail
      *
      * @param string $attribute
      */
     private function _detail($attribute)
     {
         if (is_null($this->_details)) {
+            // make cache
             $this->_details = json_decode($this->detail);
         }
         return isset($this->_details->{$attribute}) ? $this->_details->{$attribute} : null;

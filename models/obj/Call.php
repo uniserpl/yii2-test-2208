@@ -22,8 +22,6 @@ use app\models\ObjCustomer;
  * @property-read string $fullDirectionText
  * @property-read string $totalDisposition
  * @property-read string $totalStatusText
- *
- * directionText - не существующее свойство, удалил из property-read
  */
 class Call extends ObjCustomer
 {
@@ -51,9 +49,6 @@ class Call extends ObjCustomer
         return ArrayHelper::merge(
             parent::rules(),
             [
-                // 'type', 'viewed', 'outcome' - не могут упоминаться в правилах
-                //  т.к. не существуют в БД и в модели
-                // 'comment' - наоборот, забыли упомянуть
                 [['ins_ts'], 'safe'],
                 [['direction', 'phone_from', 'phone_to'], 'required'],
                 [['direction'], 'integer'],
@@ -76,8 +71,6 @@ class Call extends ObjCustomer
                 'phone_from' => Yii::t('app', 'Caller Phone'),
                 'phone_to' => Yii::t('app', 'Dialed Phone'),
                 'directionText' => Yii::t('app', 'Direction'),
-
-                // 'comment' и здесь забыли добавить
                 'comment' => Yii::t('app', 'Comment'),
             ]
         );
@@ -85,7 +78,6 @@ class Call extends ObjCustomer
 
 
     /**
-     * Исправил название ради camel caps format
      * @return string
      */
     public function getClientPhone()
@@ -98,7 +90,6 @@ class Call extends ObjCustomer
      */
     public function getDurationText()
     {
-        // Переворачиваем условие, улучшаем читабельность
         if (empty($this->duration)) {
             return '00:00';
         }
@@ -110,7 +101,6 @@ class Call extends ObjCustomer
      */
     public function getTotalStatusText()
     {
-        // Упрощаем логику, чтобы легче читался код
         if ($this->status == self::STATUS_NO_ANSWERED) {
             if ($this->direction == self::DIRECTION_INCOMING) {
                 return Yii::t('app', 'Missed Call');
@@ -146,7 +136,6 @@ class Call extends ObjCustomer
      */
     public function getTotalDisposition($hasComment = true)
     {
-        // Упрощаем логику
         return $hasComment && $this->comment ? $this->comment : '';
     }
 
