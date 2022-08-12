@@ -95,6 +95,10 @@ class Sms extends ObjCustomer
             self::STATUS_WAIT => Yii::t('app', 'Wait'),
             self::STATUS_SENT => Yii::t('app', 'Sent'),
             self::STATUS_DELIVERED => Yii::t('app', 'Delivered'),
+            
+            // Забыли ещё два статуса
+            self::STATUS_FAILED => Yii::t('app', 'Failed'),
+            self::STATUS_SUCCESS => Yii::t('app', 'Success'),
         ];
     }
 

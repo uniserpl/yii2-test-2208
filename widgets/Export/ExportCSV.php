@@ -27,7 +27,8 @@ class ExportCSV extends GridView
     private $currentPage = 0;
 
     /**
-     *
+     * Генерация строки в csv-формате
+     * 
      * @param string[] $fields
      * @param string $delimiter
      * @param string $enclosure
@@ -48,8 +49,9 @@ class ExportCSV extends GridView
     {
         $this->initPage();
 
+        // Доклеиваем расширение, если ещё нет.
         $filename = preg_replace(
-            '/(.csv)$/i',
+            '/(.csv)?$/i',
             '.csv',
             $this->filename ?: 'export-' . time()
         );

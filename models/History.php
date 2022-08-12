@@ -194,6 +194,8 @@ class History extends ActiveRecord
      */
     public function afterRefresh()
     {
+        // После того как перечитали модель из БД
+        // сбрасываем кеш поля detail
         $this->_details = null;
         parent::afterRefresh();
     }
@@ -238,7 +240,9 @@ class History extends ActiveRecord
 
     /**
      * Возвращает связанный объект независимо от его соответствия событию
-     *
+     *      т.е. если событие EVENT_CREATED_TASK, а object==sms
+     *      то $this->obj вернёт Sms() а не Task()
+     * 
      * @return ActiveQuery
      */
     public function getObj()

@@ -25,4 +25,7 @@ services:
     volumes:
       - "dbdata_mysql_maria:/var/lib/mysql"
     ports:
+      # Для доступа с хостовой машины в phpmyadmin
+      # docker run -d --name phpmyadmin -e PMA_HOST=$(docker exec americor-mysql ip route show | head -n 1 | cut -d ' ' -f 3) -e PMA_PORT=3503 -p 8082:80 phpmyadmin
+      # http://localhost:8082/
       - 3503:3306
