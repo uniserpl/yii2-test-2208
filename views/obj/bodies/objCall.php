@@ -4,16 +4,18 @@
 /* @var $history \app\models\History */
 /* @var $call \app\models\obj\Call */
 
-// Улучшаем читабельность длинной строки
 $call = $history->objModel;
 if (empty($call)) {
     echo '<i>Deleted</i> ';
     return;
 }
+
+// Улучшаем читабельность длинной строки
+// Вобще-то параметр false приводит к пустому результату, но пока оставим так.
+$totalDisposition = $call->getTotalDisposition(false);
+
 echo $call->totalStatusText . (
-    $call->getTotalDisposition(false)
-    ? " <span class='text-grey'>"
-        . $call->getTotalDisposition(false)
-        . "</span>"
+    $totalDisposition
+    ? " <span class='text-grey'>$totalDisposition</span>"
     : ""
 );
