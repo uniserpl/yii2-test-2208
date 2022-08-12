@@ -211,26 +211,6 @@ class History extends ActiveRecord
     }
 
     /**
-     * Возвращает связанный объект независимо от его соответствия событию
-     *      т.е. если событие EVENT_CREATED_TASK, а object==sms
-     *      то $this->obj вернёт Sms() а не Task()
-     * 
-     * @return ActiveQuery
-     */
-    public function getObj()
-    {
-        $object = $this->getAttribute('object');
-        if (empty($object) || empty($this->object_id)) {
-            return null;
-        }
-        $class = DynObjBehavior::NS_OBJECT_CLASS . ucfirst($object);
-        if (class_exists($class)) {
-            return $this->hasOne($class, ['id' => 'object_id']);
-        }
-        return null;
-    }
-
-    /**
      * Карта всех событий
      *
      * @return array
@@ -343,9 +323,36 @@ class History extends ActiveRecord
         return $objName ? $objName : $default;
     }
 
+    /**
+     * Возвращает связанный объект соответствующий событию
+     *      если же событие EVENT_CREATED_TASK, а object==sms, а не task,
+     *      то $this->objModel вернёт null
+     * 
+     * @return ActiveRecord|null
+     */
     public function getObjModel()
     {
         $objName = $this->getObjName();
         return $objName ? $this->$objName : $this->obj;
+    }
+    
+    /**
+     * Возвращает связанный объект независимо от его соответствия событию
+     *      т.е. если событие EVENT_CREATED_TASK, а object==sms
+     *      то $this->obj вернёт Sms() а не Task()
+     * 
+     * @return ActiveQuery
+     */
+    public function getObj()
+    {
+        $object = $this->getAttribute('object');
+        if (empty($object) || empty($this->object_id)) {
+            return null;
+        }
+        $class = DynObjBehavior::NS_OBJECT_CLASS . ucfirst($object);
+        if (class_exists($class)) {
+            return $this->hasOne($class, ['id' => 'object_id']);
+        }
+        return null;
     }
 }
