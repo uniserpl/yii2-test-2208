@@ -40,6 +40,8 @@ use app\components\DynObjBehavior;
  * @property-read obj\Call $objCall
  * @property-read obj\Fax  $objFax
  * @property-read ObjBasic $obj
+ * @property-read string $objName
+ * @property-read ObjBasic $objModel
  */
 class History extends ActiveRecord
 {
@@ -87,6 +89,31 @@ class History extends ActiveRecord
 
         self::EVENT_CUSTOMER_CHANGE_TYPE => 'Type changed',
         self::EVENT_CUSTOMER_CHANGE_QUALITY => 'Property changed',
+    ];
+
+    /**
+     * Карта зависимости объекта от события
+     *
+     * Используется при выводе ленты
+     *
+     * @var string[]
+     */
+    private static $_objects = [
+        self::EVENT_CREATED_TASK => 'objTask',
+        self::EVENT_UPDATED_TASK => 'objTask',
+        self::EVENT_COMPLETED_TASK => 'objTask',
+
+        self::EVENT_INCOMING_SMS => 'objSms',
+        self::EVENT_OUTGOING_SMS => 'objSms',
+
+        self::EVENT_OUTGOING_CALL => 'objCall',
+        self::EVENT_INCOMING_CALL => 'objCall',
+
+        self::EVENT_INCOMING_FAX => 'objFax',
+        self::EVENT_OUTGOING_FAX => 'objFax',
+
+        self::EVENT_CUSTOMER_CHANGE_TYPE => false,
+        self::EVENT_CUSTOMER_CHANGE_QUALITY => false,
     ];
 
     /**
@@ -210,13 +237,17 @@ class History extends ActiveRecord
     }
 
     /**
-     * Отложенное подключение реляционного объекта по значению поля object
+     * Возвращает связанный объект независимо от его соответствия событию
      *
      * @return ActiveQuery
      */
     public function getObj()
     {
-        $class = DynObjBehavior::NS_OBJECT_CLASS . ucfirst($this->getAttribute('object'));
+        $object = $this->getAttribute('object');
+        if (empty($object) || empty($this->object_id)) {
+            return null;
+        }
+        $class = DynObjBehavior::NS_OBJECT_CLASS . ucfirst($object);
         if (class_exists($class)) {
             return $this->hasOne($class, ['id' => 'object_id']);
         }
@@ -327,5 +358,19 @@ class History extends ActiveRecord
     {
         $data = $this->_detail('data');
         return isset($data->{$attribute}) ? $data->{$attribute} : null;
+    }
+    
+    public static function getObjectNameByEvent($event) {
+        return isset(self::$_objects[$event]) ? self::$_objects[$event] : null;
+    }
+    
+    public function getObjName($default = null) {
+        $objName = self::getObjectNameByEvent($this->event);
+        return $objName ? $objName : $default;
+    }
+    
+    public function getObjModel() {
+        $objName = $this->getObjName();
+        return $objName ? $this->$objName : $this->obj;
     }
 }

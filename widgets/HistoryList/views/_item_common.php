@@ -2,8 +2,8 @@
 
 use yii\helpers\Html;
 use app\widgets\DateTime\DateTime;
-use app\widgets\HistoryList\helpers\HistoryListHelper;
 
+/* @var $this \yii\web\View */
 /* @var $history \app\models\History */
 /* @var $user \app\models\User */
 /* @var $afterBody string */
@@ -21,7 +21,10 @@ $footerDatetime = $history->ins_ts;
 <?php echo Html::tag('i', '', ['class' => "icon icon-circle icon-main white $iconClass"]); ?>
 
     <div class="bg-success ">
-        <?php echo HistoryListHelper::getBodyByModel($history) . (isset($afterBody) ? $afterBody : '') ?>
+        <?php 
+            echo $this->render('//obj/bodies/' . $history->getObjName('unknown'), ['history' => $history]);
+            echo isset($afterBody) ? $afterBody : '';
+        ?>
 
         <?php if (isset($bodyDatetime)) : ?>
             <span>
