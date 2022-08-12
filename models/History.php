@@ -359,17 +359,20 @@ class History extends ActiveRecord
         $data = $this->_detail('data');
         return isset($data->{$attribute}) ? $data->{$attribute} : null;
     }
-    
-    public static function getObjectNameByEvent($event) {
+
+    public static function getObjectNameByEvent($event)
+    {
         return isset(self::$_objects[$event]) ? self::$_objects[$event] : null;
     }
-    
-    public function getObjName($default = null) {
+
+    public function getObjName($default = null)
+    {
         $objName = self::getObjectNameByEvent($this->event);
         return $objName ? $objName : $default;
     }
-    
-    public function getObjModel() {
+
+    public function getObjModel()
+    {
         $objName = $this->getObjName();
         return $objName ? $this->$objName : $this->obj;
     }

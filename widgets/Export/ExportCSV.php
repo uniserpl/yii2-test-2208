@@ -6,12 +6,12 @@ use yii\grid\GridView;
 
 /**
  * Экспорт гигантского CSV
- * 
+ *
  * В данный момент цель ExportCSV выгрузить все данные,
  *     а не конкретную страницу, выбранную в браузере
- * 
+ *
  * Расширяем класс GridView, т.к. в нём есть всё необходимое
- * 
+ *
  * @property \yii\data\BaseDataProvider $dataProvider
  */
 class ExportCSV extends GridView
@@ -19,15 +19,15 @@ class ExportCSV extends GridView
     public $filename;
     public $timeout = -1;
     public $batchSize = -1;
-    
+
     public $csvDelimiter = ",";
     public $csvEnclosure = '"';
     public $csvEscapeChar = '\\';
-    
-    private $currentPage=0;
-    
+
+    private $currentPage = 0;
+
     /**
-     * 
+     *
      * @param string[] $fields
      * @param string $delimiter
      * @param string $enclosure
@@ -47,33 +47,33 @@ class ExportCSV extends GridView
     public function run()
     {
         $this->initPage();
-        
+
         $filename = preg_replace(
-            '/(.csv)$/i', '.csv',
+            '/(.csv)$/i',
+            '.csv',
             $this->filename ?: 'export-' . time()
         );
-        
+
         // Start sending CSV-file
         header("Content-Disposition: attachment; filename=$filename;");
         header("Content-Type: text/csv");
-        
+
         if ($this->timeout >= 0) {
             set_time_limit($this->timeout);
         }
 
         echo $this->renderTableHeader();
-        
+
         do {
-            
             echo $this->renderTablePage();
-            
         } while ($this->nextPage());
-        
+
         // Break sending CSV-file and anything
         exit;
     }
-    
-    public function initPage() {
+
+    public function initPage()
+    {
         $pagination = $this->dataProvider->getPagination();
         if ($pagination) {
             if ($this->batchSize > 0) {
@@ -82,8 +82,9 @@ class ExportCSV extends GridView
             $pagination->setPage($this->currentPage);
         }
     }
-    
-    public function nextPage() {
+
+    public function nextPage()
+    {
         if (0 === $this->dataProvider->getCount()) {
             return false;
         }
@@ -91,14 +92,15 @@ class ExportCSV extends GridView
         if (!$pagination) {
             return false;
         }
-        $pagination->setPage(++ $this->currentPage);
+        $this->currentPage = $this->currentPage + 1;
+        $pagination->setPage($this->currentPage);
 
         /* BaseDataProvider */
         $this->dataProvider->setModels(null);
         $this->dataProvider->setKeys(null);
         return true;
     }
-    
+
     /**
      * Renders the table header.
      * @return string the rendering result.
@@ -118,7 +120,7 @@ class ExportCSV extends GridView
             $this->csvEscapeChar
         );
     }
-    
+
     /**
      * Renders the table body.
      * @return string the rendering result.
@@ -127,12 +129,12 @@ class ExportCSV extends GridView
     {
         $models = array_values($this->dataProvider->getModels());
         $keys = $this->dataProvider->getKeys();
-        
+
         $rows = [];
         foreach ($models as $index => $model) {
             $rows[] = $this->renderTableRow($model, $keys[$index], $index);
         }
-        return implode('',$rows);
+        return implode('', $rows);
     }
 
     /**
@@ -145,19 +147,19 @@ class ExportCSV extends GridView
     public function renderTableRow($model, $key, $index)
     {
         $cells = [];
-        
+
         /* @var $column \yii\grid\DataColumn */
         foreach ($this->columns as $column) {
             if ($column->content === null) {
                 $cells[] = $this->formatter->format(
-                    $column->getDataCellValue($model, $key, $index), 
+                    $column->getDataCellValue($model, $key, $index),
                     $column->format
                 );
             } else {
                 $cells[] = call_user_func($this->content, $model, $key, $index, $this);
             }
         }
-        
+
         return self::csv2str(
             $cells,
             $this->csvDelimiter,
@@ -165,5 +167,4 @@ class ExportCSV extends GridView
             $this->csvEscapeChar
         );
     }
-
 }

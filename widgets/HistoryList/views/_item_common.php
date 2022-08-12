@@ -21,7 +21,7 @@ $footerDatetime = $history->ins_ts;
 <?php echo Html::tag('i', '', ['class' => "icon icon-circle icon-main white $iconClass"]); ?>
 
     <div class="bg-success ">
-        <?php 
+        <?php
             echo $this->render('//obj/bodies/' . $history->getObjName('unknown'), ['history' => $history]);
             echo isset($afterBody) ? $afterBody : '';
         ?>

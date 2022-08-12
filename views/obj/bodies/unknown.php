@@ -9,7 +9,6 @@ use app\models\Customer;
 
 // $obj = $history->objModel;
 switch ($history->event) {
-
     case History::EVENT_CUSTOMER_CHANGE_TYPE:
         echo $history->eventText . ' ' .
             (Customer::getTypeTextByType($history->getDetailOldValue('type')) ?? 'not set') . ' to ' .
